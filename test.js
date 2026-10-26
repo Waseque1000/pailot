@@ -212,6 +212,12 @@ it('Includes 1-click in-browser test runner (runQuickTest & #runTestBtn)', () =>
     assert(scriptContent.includes('window.runGameTests = runQuickTest'), 'runGameTests should be exposed on window');
 });
 
+it('In-browser test runner exercises both Letters and Numbers (1-20) modes', () => {
+    assert(scriptContent.includes('[Letters] Testing error shake'), 'Quick test must test letters error shake');
+    assert(scriptContent.includes('[Numbers] Testing number error shake'), 'Quick test must test numbers error shake');
+    assert(scriptContent.includes('[Numbers] Testing correct number'), 'Quick test must test numbers correct answer');
+});
+
 console.log('\n========================================');
 console.log(`TEST SUMMARY: ${passedTests}/${totalTests} Passed`);
 if (passedTests === totalTests) {

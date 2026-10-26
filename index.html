@@ -1403,35 +1403,54 @@
 
                 await new Promise(r => setTimeout(r, 600));
 
-                // 1. Test Incorrect Answer -> Triggers Window Shake & Sound
-                const cards = Array.from(document.querySelectorAll(".letter-card"));
-                const wrongCard = cards.find(c => c.textContent !== target);
+                // 1. Test Incorrect Letter Answer -> Triggers Window Shake & Sound
+                let cards = Array.from(document.querySelectorAll(".letter-card"));
+                let wrongCard = cards.find(c => c.textContent !== target);
                 if (wrongCard) {
-                    showTestToast("⚡ Testing error feedback: Window shake & sound...", 1200);
+                    showTestToast("⚡ [Letters] Testing error shake & sound...", 1200);
                     wrongCard.click();
                 }
 
                 await new Promise(r => setTimeout(r, 1000));
 
-                // 2. Test Correct Answer -> Triggers Celebration & Next Round
-                const correctCard = cards.find(c => c.textContent === target);
+                // 2. Test Correct Letter Answer -> Triggers Celebration & Next Round
+                let correctCard = cards.find(c => c.textContent === target);
                 if (correctCard) {
-                    showTestToast("⭐ Testing correct answer: Stars & Confetti!", 1200);
+                    showTestToast("⭐ [Letters] Testing correct answer: Stars & Confetti!", 1200);
                     correctCard.click();
-                }
-
-                await new Promise(r => setTimeout(r, 1300));
-
-                // 3. Test Switch to Numbers (1-20)
-                const numBtn = document.querySelector('.mode-btn[data-mode="numbers"]');
-                if (numBtn) {
-                    showTestToast("🔢 Testing Numbers (1-20) Mode...", 1200);
-                    numBtn.click();
                 }
 
                 await new Promise(r => setTimeout(r, 1400));
 
-                showTestToast("🎉 All tests passed! Letters & Numbers modes are ready.", 3000);
+                // 3. Test Switch to Numbers (1-20)
+                const numBtn = document.querySelector('.mode-btn[data-mode="numbers"]');
+                if (numBtn) {
+                    showTestToast("🔢 Switching to Numbers (1-20) Mode...", 1200);
+                    numBtn.click();
+                }
+
+                await new Promise(r => setTimeout(r, 800));
+
+                // 4. Test Incorrect Number Answer -> Triggers Window Shake
+                cards = Array.from(document.querySelectorAll(".letter-card"));
+                wrongCard = cards.find(c => c.textContent !== target);
+                if (wrongCard) {
+                    showTestToast("⚡ [Numbers] Testing number error shake & tone...", 1200);
+                    wrongCard.click();
+                }
+
+                await new Promise(r => setTimeout(r, 1000));
+
+                // 5. Test Correct Number Answer -> Triggers Celebration & Speech
+                correctCard = cards.find(c => c.textContent === target);
+                if (correctCard) {
+                    showTestToast("⭐ [Numbers] Testing correct number: Stars & Speech!", 1200);
+                    correctCard.click();
+                }
+
+                await new Promise(r => setTimeout(r, 1400));
+
+                showTestToast("🎉 All tests passed! Letters & Numbers (1-20) work perfectly.", 3500);
                 if (btn) btn.disabled = false;
             }
 
