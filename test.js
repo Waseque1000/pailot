@@ -69,28 +69,15 @@ it('Has dynamic grid templates based on option count', () => {
     assert(styleContent.includes('.letter-grid[data-count="6"]'), 'Missing grid styles for 6/9 options');
 });
 
-console.log('\n--- 2. Game Data & Vocabulary Tests ---');
+it('Mode switcher buttons exist for both Letters and Numbers', () => {
+    assert(htmlContent.includes('data-mode="letters"'), 'Missing Letters mode button');
+    assert(htmlContent.includes('data-mode="numbers"'), 'Missing Numbers mode button');
+});
 
-// Extract data from script using VM sandbox
-const vm = require('vm');
-const sandbox = {
-    document: {
-        getElementById: () => ({ addEventListener: () => { }, querySelectorAll: () => [], dataset: {} }),
-        querySelectorAll: () => [],
-        createElement: () => ({ style: { setProperty: () => { } }, setAttribute: () => { }, addEventListener: () => { } }),
-        body: { appendChild: () => { } }
-    },
-    window: {
-        speechSynthesis: { cancel: () => { }, speak: () => { } }
-    },
-    setTimeout: () => { },
-    clearTimeout: () => { }
-};
+console.log('\n--- 2. Game Data & Vocabulary Tests ---');
 
 // Evaluate the script definitions in a safe context
 let extractedAlphabet = null;
-let extractedWords = null;
-let extractedPalettes = null;
 
 const alphabetMatch = scriptContent.match(/alphabet\s*=\s*"([^"]+)"\.split\(""\)/);
 if (alphabetMatch) {
@@ -109,6 +96,20 @@ it('Every letter from A to Z has a valid word and emoji', () => {
         assert(match, `Missing word/emoji for letter ${letter}`);
         assert(match[1].length > 0, `Word is empty for letter ${letter}`);
         assert(match[2].length > 0, `Emoji is empty for letter ${letter}`);
+    }
+});
+
+it('Numbers array contains numbers 1 through 20', () => {
+    assert(scriptContent.includes('numbers = Array.from({ length: 20 }'), 'Missing numbers 1-20 array');
+});
+
+it('Every number from 1 to 20 has a valid word and emoji', () => {
+    for (let i = 1; i <= 20; i++) {
+        const regex = new RegExp(`"${i}":\\s*\\["([^"]+)",\\s*"([^"]+)"\\]`);
+        const match = scriptContent.match(regex);
+        assert(match, `Missing word/emoji for number ${i}`);
+        assert(match[1].length > 0, `Word is empty for number ${i}`);
+        assert(match[2].length > 0, `Emoji is empty for number ${i}`);
     }
 });
 
@@ -145,6 +146,33 @@ it('Question builder ensures target letter is always among options with no dupli
         assert.strictEqual(questions.length, 10, `${lvl} mode must generate 10 questions`);
         questions.forEach((q, idx) => {
             assert(q.options.includes(q.target), `Question ${idx + 1} in ${lvl} must include target letter ${q.target}`);
+            assert.strictEqual(q.options.length, levelCounts[lvl], `Question ${idx + 1} in ${lvl} must have ${levelCounts[lvl]} options`);
+            const uniqueOptions = new Set(q.options);
+            assert.strictEqual(uniqueOptions.size, levelCounts[lvl], `Question ${idx + 1} options must be unique`);
+        });
+    });
+});
+
+it('Question builder ensures target number (1-20) is always among options with no duplicates', () => {
+    function shuffle(arr) {
+        return [...arr].sort(() => Math.random() - 0.5);
+    }
+    const numbers = Array.from({ length: 20 }, (_, i) => String(i + 1));
+    const levelCounts = { easy: 4, medium: 6, hard: 9 };
+
+    ['easy', 'medium', 'hard'].forEach(lvl => {
+        const picked = shuffle(numbers).slice(0, 10);
+        const questions = picked.map(num => {
+            const others = shuffle(numbers.filter(i => i !== num)).slice(0, levelCounts[lvl] - 1);
+            return {
+                target: num,
+                options: shuffle([num, ...others])
+            };
+        });
+
+        assert.strictEqual(questions.length, 10, `${lvl} mode must generate 10 questions`);
+        questions.forEach((q, idx) => {
+            assert(q.options.includes(q.target), `Question ${idx + 1} in ${lvl} must include target number ${q.target}`);
             assert.strictEqual(q.options.length, levelCounts[lvl], `Question ${idx + 1} in ${lvl} must have ${levelCounts[lvl]} options`);
             const uniqueOptions = new Set(q.options);
             assert.strictEqual(uniqueOptions.size, levelCounts[lvl], `Question ${idx + 1} options must be unique`);

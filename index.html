@@ -133,6 +133,54 @@
             box-shadow: 0 20px 60px rgba(65, 50, 110, 0.1);
         }
 
+        .mode-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 2px dashed #ece7ff;
+            flex-wrap: wrap;
+        }
+
+        .mode-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .modes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            border-radius: 999px;
+            padding: 8px 16px;
+            background: #fbfaff;
+            color: #6d6689;
+            font-weight: 800;
+            font-size: clamp(0.82rem, 2.2vw, 0.92rem);
+            border: 2px solid #e7e2fa;
+            white-space: nowrap;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--purple);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
+            box-shadow: 0 4px 12px rgba(119, 87, 232, 0.28);
+        }
+
         .topline {
             display: flex;
             justify-content: space-between;
@@ -669,6 +717,22 @@
                 padding-top: 14px;
             }
 
+            .mode-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .modes {
+                width: 100%;
+            }
+
+            .mode-btn {
+                flex: 1;
+                text-align: center;
+                padding: 10px 8px;
+            }
+
             .topline {
                 flex-direction: column;
                 align-items: stretch;
@@ -803,23 +867,31 @@
 
         <header>
             <div class="brand">
-                <div class="brand-mark">A</div>
-                <span>Letter Quest</span>
+                <div class="brand-mark" id="brandMark">A</div>
+                <span id="brandTitle">Letter Quest</span>
             </div>
             <div class="pill">🌟 Little Learner Club</div>
         </header>
 
         <section class="hero">
             <div class="eyebrow">Play • Learn • Grow</div>
-            <h1>Ready to find your <span>letters?</span></h1>
-            <p class="sub">
+            <h1 id="heroTitle">Ready to find your <span>letters?</span></h1>
+            <p class="sub" id="heroSub">
                 Look at the big letter, then tap the same letter below.
                 Every correct answer earns you a star!
             </p>
         </section>
 
-        <main class="game" aria-label="Letter matching game">
+        <main class="game" aria-label="Learning game">
             <div id="gameScreen">
+
+                <div class="mode-row">
+                    <span class="mode-label">Learning Quest</span>
+                    <div class="modes">
+                        <button class="mode-btn active" data-mode="letters" type="button" aria-pressed="true">🔤 Letters (A–Z)</button>
+                        <button class="mode-btn" data-mode="numbers" type="button" aria-pressed="false">🔢 Numbers (1–20)</button>
+                    </div>
+                </div>
 
                 <div class="topline">
                     <div>
@@ -854,14 +926,14 @@
                 <div class="challenge">
 
                     <div class="target-box">
-                        <div class="target-label">Find this letter</div>
+                        <div class="target-label" id="targetLabel">Find this letter</div>
                         <div class="target-letter" id="targetLetter">A</div>
                         <div class="target-hint" id="targetHint">A is for Apple 🍎</div>
                         <button class="sound-btn" id="soundBtn">🔊 Hear the letter</button>
                     </div>
 
                     <div class="choose-area">
-                        <p class="choose-title">Which one matches? 👀</p>
+                        <p class="choose-title" id="chooseTitle">Which one matches? 👀</p>
                         <div class="letter-grid" id="letterGrid"></div>
 
                         <div class="message" id="message" role="status" aria-live="polite">
@@ -885,7 +957,7 @@
 
             <div class="finish" id="finishScreen">
                 <div class="trophy">🏆</div>
-                <h2>You're a Letter Superstar!</h2>
+                <h2 id="finishTitle">You're a Letter Superstar!</h2>
                 <p id="finishText"></p>
                 <div class="finish-stars" id="finishStars"></div>
                 <button class="next-btn" id="playAgainBtn">Play again 🎉</button>
@@ -902,7 +974,10 @@
 
     <script>
         (() => {
+            let mode = "letters"; // "letters" or "numbers"
+
             const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+            const numbers = Array.from({ length: 20 }, (_, i) => String(i + 1));
 
             const words = {
                 A: ["Apple", "🍎"], B: ["Ball", "⚽"],
@@ -918,6 +993,19 @@
                 U: ["Umbrella", "☂️"], V: ["Van", "🚐"],
                 W: ["Whale", "🐳"], X: ["Xylophone", "🎵"],
                 Y: ["Yo-yo", "🪀"], Z: ["Zebra", "🦓"]
+            };
+
+            const numberWords = {
+                "1": ["One", "🥇"], "2": ["Two", "🍒"],
+                "3": ["Three", "🥉"], "4": ["Four", "🍀"],
+                "5": ["Five", "🖐️"], "6": ["Six", "🎲"],
+                "7": ["Seven", "🌈"], "8": ["Eight", "🐙"],
+                "9": ["Nine", "🎈"], "10": ["Ten", "🔟"],
+                "11": ["Eleven", "⚽"], "12": ["Twelve", "⏰"],
+                "13": ["Thirteen", "🍬"], "14": ["Fourteen", "💎"],
+                "15": ["Fifteen", "🎨"], "16": ["Sixteen", "🚀"],
+                "17": ["Seventeen", "🦋"], "18": ["Eighteen", "🍦"],
+                "19": ["Nineteen", "🌸"], "20": ["Twenty", "🏆"]
             };
 
             const palettes = [
@@ -961,16 +1049,17 @@
             }
 
             function buildQuestions() {
-                const picked = shuffle(alphabet).slice(0, totalRounds);
+                const pool = mode === "numbers" ? numbers : alphabet;
+                const picked = shuffle(pool).slice(0, totalRounds);
 
-                questions = picked.map(letter => {
-                    const otherLetters = shuffle(
-                        alphabet.filter(item => item !== letter)
+                questions = picked.map(item => {
+                    const otherItems = shuffle(
+                        pool.filter(val => val !== item)
                     ).slice(0, levelCounts[level] - 1);
 
                     return {
-                        target: letter,
-                        options: shuffle([letter, ...otherLetters])
+                        target: item,
+                        options: shuffle([item, ...otherItems])
                     };
                 });
             }
@@ -1018,19 +1107,41 @@
 
                 $("targetLetter").textContent = target;
 
-                const [word, emoji] = words[target];
-                $("targetHint").textContent =
-                    `${target} is for ${word} ${emoji}`;
+                if (mode === "numbers") {
+                    const [word, emoji] = numberWords[target] || [target, "🔢"];
+                    $("targetHint").textContent = `${target} is for ${word} ${emoji}`;
+                    if ($("targetLabel")) $("targetLabel").textContent = "Find this number";
+                    if ($("soundBtn")) $("soundBtn").textContent = "🔊 Hear the number";
+                    if ($("chooseTitle")) $("chooseTitle").textContent = "Which number matches? 👀";
+                    $("helperText").textContent =
+                        level === "easy"
+                            ? "Tip: Look carefully at the number."
+                            : level === "medium"
+                                ? "Count and look closely at each number!"
+                                : "Super counter mode! Focus and pick the right number.";
+                } else {
+                    const [word, emoji] = words[target] || [target, "🔤"];
+                    $("targetHint").textContent = `${target} is for ${word} ${emoji}`;
+                    if ($("targetLabel")) $("targetLabel").textContent = "Find this letter";
+                    if ($("soundBtn")) $("soundBtn").textContent = "🔊 Hear the letter";
+                    if ($("chooseTitle")) $("chooseTitle").textContent = "Which one matches? 👀";
+                    $("helperText").textContent =
+                        level === "easy"
+                            ? "Tip: Look carefully at the shape of the letter."
+                            : level === "medium"
+                                ? "Look closely—some letters may look similar!"
+                                : "Challenge mode! Focus and choose carefully.";
+                }
 
                 $("letterGrid").dataset.count = questions[round].options.length;
                 $("letterGrid").replaceChildren();
 
-                questions[round].options.forEach((letter, index) => {
+                questions[round].options.forEach((item, index) => {
                     const button = document.createElement("button");
                     const palette = palettes[index % palettes.length];
 
                     button.className = "letter-card";
-                    button.textContent = letter;
+                    button.textContent = item;
                     button.type = "button";
 
                     button.style.setProperty("--card-bg", palette[0]);
@@ -1038,10 +1149,10 @@
                     button.style.setProperty("--card-ink", palette[2]);
                     button.style.setProperty("--card-shadow", palette[3]);
 
-                    button.setAttribute("aria-label", `Letter ${letter}`);
+                    button.setAttribute("aria-label", `${mode === "numbers" ? "Number" : "Letter"} ${item}`);
 
                     button.addEventListener("click", () => {
-                        chooseLetter(letter, button);
+                        chooseLetter(item, button);
                     });
 
                     $("letterGrid").appendChild(button);
@@ -1049,24 +1160,17 @@
 
                 $("nextBtn").disabled = true;
                 $("nextBtn").textContent =
-                    round === totalRounds - 1 ? "Finishing soon..." : "Next letter →";
-
-                $("helperText").textContent =
-                    level === "easy"
-                        ? "Tip: Look carefully at the shape of the letter."
-                        : level === "medium"
-                            ? "Look closely—some letters may look similar!"
-                            : "Challenge mode! Focus and choose carefully.";
+                    round === totalRounds - 1 ? "Finishing soon..." : (mode === "numbers" ? "Next number →" : "Next letter →");
 
                 setMessage("", "💡", "Take your time. You can do it!");
 
                 updateStats();
             }
 
-            function chooseLetter(letter, button) {
+            function chooseLetter(item, button) {
                 if (answered) return;
 
-                if (letter === target) {
+                if (item === target) {
                     answered = true;
                     score++;
                     correctCount++;
@@ -1080,7 +1184,7 @@
                     const praise = [
                         "Amazing! That's right!",
                         "Brilliant! You found it!",
-                        "Super job, letter explorer!",
+                        `Super job, ${mode === "numbers" ? "number" : "letter"} explorer!`,
                         "You did it! High five!"
                     ];
 
@@ -1094,7 +1198,7 @@
                     celebrate();
                     speakLetter(target);
 
-                    // Automatically go to the next letter after a correct answer.
+                    // Automatically go to the next question after a correct answer.
                     advanceTimer = setTimeout(() => {
                         round++;
                         renderQuestion();
@@ -1111,7 +1215,7 @@
                     setMessage(
                         "try-again",
                         "❌",
-                        "Not quite! Try another letter. You've got this!"
+                        `Not quite! Try another ${mode === "numbers" ? "number" : "letter"}. You've got this!`
                     );
                 }
             }
@@ -1159,12 +1263,13 @@
                 } catch (e) {}
             }
 
-            function speakLetter(letter) {
+            function speakLetter(item) {
                 if (!("speechSynthesis" in window)) return;
 
                 window.speechSynthesis.cancel();
 
-                const speech = new SpeechSynthesisUtterance(letter);
+                const spokenText = mode === "numbers" && numberWords[item] ? numberWords[item][0] : item;
+                const speech = new SpeechSynthesisUtterance(spokenText);
                 speech.rate = 0.72;
                 speech.pitch = 1.2;
 
@@ -1197,8 +1302,12 @@
                 $("progressFill").style.width = "100%";
                 $("progressText").textContent = "100%";
 
+                const itemType = mode === "numbers" ? "numbers" : "letters";
+                if ($("finishTitle")) {
+                    $("finishTitle").textContent = mode === "numbers" ? "You're a Number Superstar!" : "You're a Letter Superstar!";
+                }
                 $("finishText").textContent =
-                    `You earned ${score} stars! You answered ${correctCount} letters correctly on your first try. Every try helps your brain grow!`;
+                    `You earned ${score} stars! You answered ${correctCount} ${itemType} correctly on your first try. Every try helps your brain grow!`;
 
                 $("finishStars").textContent =
                     "⭐".repeat(score) + "☆".repeat(totalRounds - score);
@@ -1222,6 +1331,34 @@
                 buildQuestions();
                 renderQuestion();
             }
+
+            document.querySelectorAll(".mode-btn").forEach(button => {
+                button.addEventListener("click", () => {
+                    mode = button.dataset.mode;
+
+                    document.querySelectorAll(".mode-btn").forEach(item => {
+                        const active = item === button;
+                        item.classList.toggle("active", active);
+                        item.setAttribute("aria-pressed", String(active));
+                    });
+
+                    if (mode === "numbers") {
+                        if ($("brandMark")) $("brandMark").textContent = "123";
+                        if ($("brandTitle")) $("brandTitle").textContent = "Number Quest";
+                        if ($("heroTitle")) $("heroTitle").innerHTML = "Ready to count your <span>numbers?</span>";
+                        if ($("heroSub")) $("heroSub").textContent = "Look at the big number, then tap the same number below. Every correct answer earns you a star!";
+                        document.title = "Number Quest - Kids Brain Game";
+                    } else {
+                        if ($("brandMark")) $("brandMark").textContent = "A";
+                        if ($("brandTitle")) $("brandTitle").textContent = "Letter Quest";
+                        if ($("heroTitle")) $("heroTitle").innerHTML = "Ready to find your <span>letters?</span>";
+                        if ($("heroSub")) $("heroSub").textContent = "Look at the big letter, then tap the same letter below. Every correct answer earns you a star!";
+                        document.title = "Letter Quest - Kids Brain Game";
+                    }
+
+                    startGame();
+                });
+            });
 
             document.querySelectorAll(".level-btn").forEach(button => {
                 button.addEventListener("click", () => {
@@ -1283,9 +1420,18 @@
                     correctCard.click();
                 }
 
+                await new Promise(r => setTimeout(r, 1300));
+
+                // 3. Test Switch to Numbers (1-20)
+                const numBtn = document.querySelector('.mode-btn[data-mode="numbers"]');
+                if (numBtn) {
+                    showTestToast("🔢 Testing Numbers (1-20) Mode...", 1200);
+                    numBtn.click();
+                }
+
                 await new Promise(r => setTimeout(r, 1400));
 
-                showTestToast("🎉 All tests passed! Game is running smoothly.", 3000);
+                showTestToast("🎉 All tests passed! Letters & Numbers modes are ready.", 3000);
                 if (btn) btn.disabled = false;
             }
 
