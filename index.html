@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Quest - Kids Brain Game</title>
+
+    <style>
+        :root {
+            --purple: #7757e8;
+            --ink: #253052;
+            --muted: #6b7595;
+            --pink: #ff78ad;
+            --mint: #70e2c0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 12%, #ffe6f0 0 7%, transparent 7.5%),
+                radial-gradient(circle at 92% 16%, #dff5ff 0 8%, transparent 8.5%),
+                linear-gradient(135deg, #fff9e9, #f4f0ff 55%, #eaf9ff);
+        }
+
+        .wrap {
+            width: min(1080px, calc(100% - 32px));
+            margin: auto;
+            padding: 22px 0 36px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 900;
+            font-size: 1.25rem;
+        }
+
+        .brand-mark {
+            width: 46px;
+            height: 46px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--purple), #a78bfa);
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 1.6rem;
+        }
+
+        .pill {
+            background: white;
+            border: 2px solid #eee9ff;
+            padding: 10px 15px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 12px 0 24px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 999px;
+            background: #fff0bd;
+            color: #8c6200;
+            font-size: .78rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            margin: 14px 0 8px;
+            font-size: clamp(2.2rem, 6vw, 4.1rem);
+            line-height: 1.04;
+        }
+
+        h1 span {
+            color: var(--purple);
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 580px;
+            margin: auto;
+            line-height: 1.6;
+        }
+
+        .game {
+            background: rgba(255, 255, 255, .9);
+            border: 3px solid white;
+            border-radius: 30px;
+            padding: clamp(18px, 4vw, 34px);
+            box-shadow: 0 20px 60px #41326e12;
+        }
+
+        .topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .level-label {
+            font-size: .78rem;
+            color: var(--muted);
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .levels {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+            border: 0;
+            transition: .2s ease;
+        }
+
+        button:focus-visible {
+            outline: 4px solid #ffbf47;
+            outline-offset: 3px;
+        }
+
+        .level-btn {
+            border-radius: 999px;
+            padding: 10px 14px;
+            background: #f3f1fc;
+            color: #6d6689;
+            font-weight: 800;
+        }
+
+        .level-btn.active {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 5px 12px #7757e833;
+        }
+
+        .level-btn:hover,
+        .sound-btn:hover,
+        .restart-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat {
+            min-width: 88px;
+            text-align: center;
+            background: #fff9e6;
+            border: 2px solid #fff0bf;
+            padding: 9px 12px;
+            border-radius: 17px;
+        }
+
+        .stat:nth-child(2) {
+            background: #e9fff7;
+            border-color: #d1f8e9;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.18rem;
+        }
+
+        .stat small {
+            color: var(--muted);
+            font-size: .75rem;
+            font-weight: 800;
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            color: var(--muted);
+            font-size: .85rem;
+            font-weight: 800;
+        }
+
+        .progress-track {
+            height: 11px;
+            background: #eeeafb;
+            border-radius: 99px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            transition: width .35s ease;
+        }
+
+        .challenge {
+            display: grid;
+            grid-template-columns: minmax(150px, .8fr) 1.6fr;
+            gap: clamp(20px, 4vw, 38px);
+            align-items: center;
+        }
+
+        .target-box {
+            text-align: center;
+            background: linear-gradient(145deg, #f0eaff, #e9f6ff);
+            border-radius: 26px;
+            padding: 22px 14px;
+            position: relative;
+        }
+
+        .target-label {
+            font-weight: 900;
+            color: #70658e;
+            font-size: .83rem;
+            letter-spacing: 1px;
+        }
+
+        .target-letter {
+            font-size: clamp(5rem, 12vw, 8rem);
+            font-weight: 1000;
+            line-height: 1.08;
+            color: var(--purple);
+            text-shadow: 0 5px 0 #d8cdfd;
+            margin: 8px 0 2px;
+        }
+
+        .target-hint {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .sound-btn {
+            margin-top: 14px;
+            background: white;
+            border: 2px solid #e5ddff;
+            border-radius: 999px;
+            padding: 10px 14px;
+            color: var(--purple);
+            font-weight: 900;
+        }
+
+        .choose-area {
+            min-width: 0;
+        }
+
+        .choose-title {
+            font-size: 1.12rem;
+            font-weight: 900;
+            margin: 0 0 15px;
+        }
+
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .letter-card {
+            min-height: 78px;
+            border-radius: 19px;
+            background: var(--card-bg, #fff1f6);
+            border: 3px solid var(--card-border, #ffd6e5);
+            color: var(--card-ink, #b93870);
+            font-size: clamp(1.8rem, 4vw, 2.7rem);
+            font-weight: 1000;
+            box-shadow: 0 5px 0 var(--card-shadow, #f7c3d6);
+        }
+
+        .letter-card:hover:not(:disabled) {
+            transform: translateY(-4px) rotate(-2deg);
+            box-shadow: 0 9px 0 var(--card-shadow, #f7c3d6);
+        }
+
+        .letter-card:disabled {
+            cursor: default;
+            opacity: .85;
+        }
+
+        .letter-card.correct {
+            background: #d9fff0;
+            border-color: #7ce5bd;
+            color: #087d5c;
+            box-shadow: 0 5px 0 #8edfc3;
+            animation: pop .35s ease;
+        }
+
+        .letter-card.wrong {
+            background: #ffe6e6;
+            border-color: #ffaaaa;
+            color: #c53d52;
+            box-shadow: 0 5px 0 #f6baba;
+            animation: shake .28s ease;
+        }
+
+        .message {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 18px;
+            padding: 12px 15px;
+            border-radius: 17px;
+            background: #f8f6ff;
+            color: #665a8a;
+            font-weight: 800;
+        }
+
+        .message .emoji {
+            font-size: 1.45rem;
+        }
+
+        .message.success {
+            background: #e7fff4;
+            color: #087d5c;
+        }
+
+        .message.try-again {
+            background: #fff4df;
+            color: #946400;
+        }
+
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .helper {
+            color: var(--muted);
+            font-size: .88rem;
+        }
+
+        .next-btn,
+        .restart-btn {
+            padding: 13px 20px;
+            border-radius: 15px;
+            font-weight: 900;
+        }
+
+        .next-btn {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 6px 0 #5d41c8;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #766a9d;
+            border: 2px solid #ece7ff;
+        }
+
+        .finish {
+            display: none;
+            text-align: center;
+            padding: 24px 10px 10px;
+        }
+
+        .finish .trophy {
+            font-size: 4rem;
+        }
+
+        .finish h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+        }
+
+        .finish p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .confetti {
+            position: fixed;
+            top: -20px;
+            z-index: 10;
+            font-size: 20px;
+            pointer-events: none;
+            animation: fall 1.7s linear forwards;
+        }
+
+        footer {
+            text-align: center;
+            color: #8a88a5;
+            font-size: .82rem;
+            padding: 22px 0 0;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.8);
+            }
+
+            70% {
+                transform: scale(1.12);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(540deg);
+                opacity: .2;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .challenge {
+                grid-template-columns: 1fr;
+            }
+
+            .target-box {
+                padding: 18px;
+            }
+
+            .target-letter {
+                font-size: 5rem;
+            }
+
+            .letter-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .letter-card {
+                min-height: 68px;
+            }
+
+            .stats {
+                width: 100%;
+            }
+
+            .stat {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .wrap {
+                width: calc(100% - 20px);
+                padding-top: 14px;
+            }
+
+            header {
+                align-items: flex-start;
+            }
+
+            .brand {
+                font-size: 1rem;
+            }
+
+            .brand-mark {
+                width: 40px;
+                height: 40px;
+            }
+
+            .pill {
+                font-size: .78rem;
+                padding: 9px 11px;
+            }
+
+            .letter-grid {
+                gap: 9px;
+            }
+
+            .letter-card {
+                min-height: 61px;
+                border-radius: 15px;
+            }
+
+            .game {
+                border-radius: 23px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <div class="brand">
+                <div class="brand-mark">A</div>
+                <span>Letter Quest</span>
+            </div>
+            <div class="pill">🌟 Little Learner Club</div>
+        </header>
+
+        <section class="hero">
+            <div class="eyebrow">Play • Learn • Grow</div>
+            <h1>Ready to find your <span>letters?</span></h1>
+            <p class="sub">
+                Look at the big letter, then tap the same letter below.
+                Every correct answer earns you a star!
+            </p>
+        </section>
+
+        <main class="game" aria-label="Letter matching game">
+            <div id="gameScreen">
+
+                <div class="topline">
+                    <div>
+                        <div class="level-label">Choose your adventure</div>
+                        <div class="levels">
+                            <button class="level-btn active" data-level="easy">🐣 Easy</button>
+                            <button class="level-btn" data-level="medium">🚀 Medium</button>
+                            <button class="level-btn" data-level="hard">🧠 Hard</button>
+                        </div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat">
+                            <strong id="score">0 ⭐</strong>
+                            <small>Stars</small>
+                        </div>
+                        <div class="stat">
+                            <strong id="round">1/10</strong>
+                            <small>Round</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-row">
+                    <span>Adventure progress</span>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+
+                <div class="challenge">
+
+                    <div class="target-box">
+                        <div class="target-label">Find this letter</div>
+                        <div class="target-letter" id="targetLetter">A</div>
+                        <div class="target-hint" id="targetHint">A is for Apple 🍎</div>
+                        <button class="sound-btn" id="soundBtn">🔊 Hear the letter</button>
+                    </div>
+
+                    <div class="choose-area">
+                        <p class="choose-title">Which one matches? 👀</p>
+                        <div class="letter-grid" id="letterGrid"></div>
+
+                        <div class="message" id="message" role="status" aria-live="polite">
+                            <span class="emoji">💡</span>
+                            <span>Take your time. You can do it!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-row">
+                    <div class="helper" id="helperText">
+                        Tip: Look carefully at the shape of the letter.
+                    </div>
+
+                    <div style="display:flex;gap:10px;align-items:center">
+                        <button class="restart-btn" id="restartBtn">↻ Start over</button>
+                        <button class="next-btn" id="nextBtn" disabled>Next letter →</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="finish" id="finishScreen">
+                <div class="trophy">🏆</div>
+                <h2>You're a Letter Superstar!</h2>
+                <p id="finishText"></p>
+                <div style="font-size:1.6rem;margin:14px 0" id="finishStars"></div>
+                <button class="next-btn" id="playAgainBtn">Play again 🎉</button>
+            </div>
+        </main>
+
+        <footer>
+            Made with 💜 for curious little minds · Keep playing, keep learning!
+        </footer>
+    </div>
+
+    <script>
+        (() => {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+            const words = {
+                A: ["Apple", "🍎"], B: ["Ball", "⚽"],
+                C: ["Cat", "🐱"], D: ["Dog", "🐶"],
+                E: ["Elephant", "🐘"], F: ["Fish", "🐟"],
+                G: ["Giraffe", "🦒"], H: ["House", "🏠"],
+                I: ["Ice cream", "🍦"], J: ["Juice", "🧃"],
+                K: ["Kite", "🪁"], L: ["Lion", "🦁"],
+                M: ["Moon", "🌙"], N: ["Nest", "🪺"],
+                O: ["Orange", "🍊"], P: ["Penguin", "🐧"],
+                Q: ["Queen", "👑"], R: ["Rainbow", "🌈"],
+                S: ["Sun", "☀️"], T: ["Turtle", "🐢"],
+                U: ["Umbrella", "☂️"], V: ["Van", "🚐"],
+                W: ["Whale", "🐳"], X: ["Xylophone", "🎵"],
+                Y: ["Yo-yo", "🪀"], Z: ["Zebra", "🦓"]
+            };
+
+            const palettes = [
+                ["#fff0f5", "#ffd5e4", "#b8326c", "#f5bfd3"],
+                ["#e9f8ff", "#c5eaff", "#176a9c", "#addcf7"],
+                ["#fff7d9", "#ffe7a0", "#8d6500", "#f4d47b"],
+                ["#e8fff5", "#baf3df", "#08795c", "#a0e5cf"],
+                ["#f1edff", "#d8ceff", "#6045b6", "#c6b8fb"],
+                ["#fff0e4", "#ffd4b7", "#a94e20", "#f4c09d"],
+                ["#edf9df", "#d0efae", "#4b7e1f", "#b9df91"],
+                ["#ffeaf0", "#ffc7d8", "#ad355b", "#f1adc4"]
+            ];
+
+            const $ = id => document.getElementById(id);
+
+            let level = "easy";
+            let round = 0;
+            let score = 0;
+            let target = "A";
+            let answered = false;
+            let correctCount = 0;
+            let questions = [];
+            let advanceTimer = null;
+
+            const totalRounds = 10;
+            const levelCounts = {
+                easy: 4,
+                medium: 6,
+                hard: 9
+            };
+
+            function shuffle(array) {
+                const result = [...array];
+
+                for (let i = result.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [result[i], result[j]] = [result[j], result[i]];
+                }
+
+                return result;
+            }
+
+            function buildQuestions() {
+                const picked = shuffle(alphabet).slice(0, totalRounds);
+
+                questions = picked.map(letter => {
+                    const otherLetters = shuffle(
+                        alphabet.filter(item => item !== letter)
+                    ).slice(0, levelCounts[level] - 1);
+
+                    return {
+                        target: letter,
+                        options: shuffle([letter, ...otherLetters])
+                    };
+                });
+            }
+
+            function setMessage(type, emoji, text) {
+                const message = $("message");
+
+                message.className = "message" + (type ? " " + type : "");
+                message.replaceChildren();
+
+                const emojiSpan = document.createElement("span");
+                emojiSpan.className = "emoji";
+                emojiSpan.textContent = emoji;
+
+                const textSpan = document.createElement("span");
+                textSpan.textContent = text;
+
+                message.append(emojiSpan, textSpan);
+            }
+
+            function updateStats() {
+                $("score").textContent = `${score} ⭐`;
+                $("round").textContent =
+                    `${Math.min(round + 1, totalRounds)}/${totalRounds}`;
+
+                const percentage = Math.round(round / totalRounds * 100);
+
+                $("progressFill").style.width = `${percentage}%`;
+                $("progressText").textContent = `${percentage}%`;
+            }
+
+            function renderQuestion() {
+                if (advanceTimer) {
+                    clearTimeout(advanceTimer);
+                    advanceTimer = null;
+                }
+
+                if (round >= totalRounds) {
+                    finishGame();
+                    return;
+                }
+
+                answered = false;
+                target = questions[round].target;
+
+                $("targetLetter").textContent = target;
+
+                const [word, emoji] = words[target];
+                $("targetHint").textContent =
+                    `${target} is for ${word} ${emoji}`;
+
+                $("letterGrid").replaceChildren();
+
+                questions[round].options.forEach((letter, index) => {
+                    const button = document.createElement("button");
+                    const palette = palettes[index % palettes.length];
+
+                    button.className = "letter-card";
+                    button.textContent = letter;
+                    button.type = "button";
+
+                    button.style.setProperty("--card-bg", palette[0]);
+                    button.style.setProperty("--card-border", palette[1]);
+                    button.style.setProperty("--card-ink", palette[2]);
+                    button.style.setProperty("--card-shadow", palette[3]);
+
+                    button.setAttribute("aria-label", `Letter ${letter}`);
+
+                    button.addEventListener("click", () => {
+                        chooseLetter(letter, button);
+                    });
+
+                    $("letterGrid").appendChild(button);
+                });
+
+                $("nextBtn").disabled = true;
+                $("nextBtn").textContent =
+                    round === totalRounds - 1 ? "Finishing soon..." : "Next letter →";
+
+                $("helperText").textContent =
+                    level === "easy"
+                        ? "Tip: Look carefully at the shape of the letter."
+                        : level === "medium"
+                            ? "Look closely—some letters may look similar!"
+                            : "Challenge mode! Focus and choose carefully.";
+
+                setMessage("", "💡", "Take your time. You can do it!");
+
+                updateStats();
+            }
+
+            function chooseLetter(letter, button) {
+                if (answered) return;
+
+                if (letter === target) {
+                    answered = true;
+                    score++;
+                    correctCount++;
+
+                    button.classList.add("correct");
+
+                    document.querySelectorAll(".letter-card").forEach(card => {
+                        card.disabled = true;
+                    });
+
+                    const praise = [
+                        "Amazing! That's right!",
+                        "Brilliant! You found it!",
+                        "Super job, letter explorer!",
+                        "You did it! High five!"
+                    ];
+
+                    setMessage(
+                        "success",
+                        "🎉",
+                        praise[Math.floor(Math.random() * praise.length)]
+                    );
+
+                    $("score").textContent = `${score} ⭐`;
+                    celebrate();
+                    speakLetter(target);
+
+                    // Automatically go to the next letter after a correct answer.
+                    advanceTimer = setTimeout(() => {
+                        round++;
+                        renderQuestion();
+                    }, 1100);
+
+                } else {
+                    // Wrong answer: show an error and allow another attempt.
+                    button.classList.add("wrong");
+                    button.disabled = true;
+
+                    setMessage(
+                        "try-again",
+                        "❌",
+                        "Not quite! Try another letter. You've got this!"
+                    );
+                }
+            }
+
+            function speakLetter(letter) {
+                if (!("speechSynthesis" in window)) return;
+
+                window.speechSynthesis.cancel();
+
+                const speech = new SpeechSynthesisUtterance(letter);
+                speech.rate = 0.72;
+                speech.pitch = 1.2;
+
+                window.speechSynthesis.speak(speech);
+            }
+
+            function celebrate() {
+                const decorations = ["⭐", "✨", "🎉", "💜", "🌈"];
+
+                for (let i = 0; i < 18; i++) {
+                    const element = document.createElement("span");
+
+                    element.className = "confetti";
+                    element.textContent =
+                        decorations[Math.floor(Math.random() * decorations.length)];
+
+                    element.style.left = Math.random() * 100 + "vw";
+                    element.style.animationDelay = Math.random() * 0.35 + "s";
+
+                    document.body.appendChild(element);
+
+                    setTimeout(() => element.remove(), 2200);
+                }
+            }
+
+            function finishGame() {
+                $("gameScreen").style.display = "none";
+                $("finishScreen").style.display = "block";
+
+                $("progressFill").style.width = "100%";
+                $("progressText").textContent = "100%";
+
+                $("finishText").textContent =
+                    `You earned ${score} stars! You answered ${correctCount} letters correctly on your first try. Every try helps your brain grow!`;
+
+                $("finishStars").textContent =
+                    "⭐".repeat(score) + "☆".repeat(totalRounds - score);
+
+                celebrate();
+            }
+
+            function startGame() {
+                if (advanceTimer) {
+                    clearTimeout(advanceTimer);
+                    advanceTimer = null;
+                }
+
+                round = 0;
+                score = 0;
+                correctCount = 0;
+
+                $("gameScreen").style.display = "block";
+                $("finishScreen").style.display = "none";
+
+                buildQuestions();
+                renderQuestion();
+            }
+
+            document.querySelectorAll(".level-btn").forEach(button => {
+                button.addEventListener("click", () => {
+                    level = button.dataset.level;
+
+                    document.querySelectorAll(".level-btn").forEach(item => {
+                        const active = item === button;
+
+                        item.classList.toggle("active", active);
+                        item.setAttribute("aria-pressed", String(active));
+                    });
+
+                    startGame();
+                });
+            });
+
+            $("soundBtn").addEventListener("click", () => {
+                speakLetter(target);
+            });
+
+            $("nextBtn").addEventListener("click", () => {
+                if (!answered || advanceTimer) return;
+
+                round++;
+                renderQuestion();
+            });
+
+            $("restartBtn").addEventListener("click", startGame);
+            $("playAgainBtn").addEventListener("click", startGame);
+
+            startGame();
+        })();
+    </script>
+</body>
+
+</html>
